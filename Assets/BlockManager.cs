@@ -22,10 +22,4 @@ public class BlockManager : MonoBehaviour {
 	void Update () {
 	
 	}
-	
-	void OnGUI() {
-		if( GUI.Button(new Rect(0,0,100,50),"push") ){
-			
-		}
-	}
 }
