@@ -5,6 +5,8 @@ public class BlockManager : MonoBehaviour {
 	
 	public GameObject src;
 	
+	public Material[] BlockMat = new Material[(int)Block.TYPE.TYPE_MAX];
+	
 	const int table_width = 8;
 	const int table_height = 6;
 	

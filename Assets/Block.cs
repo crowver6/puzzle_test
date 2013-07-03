@@ -5,7 +5,7 @@ using System.Collections;
 
 public class Block : MonoBehaviour {
 
-	enum TYPE{
+	public enum TYPE{
 		TYPE_1,
 		TYPE_2,
 		TYPE_3,
@@ -24,6 +24,7 @@ public class Block : MonoBehaviour {
 
 	public int type;
 	Material mat;
+	MeshRenderer mesh_renderer;
 	
 	
 	
@@ -32,6 +33,7 @@ public class Block : MonoBehaviour {
 	void Start () {
 		type = (int)(Random.Range((int)TYPE.TYPE_1,(int)TYPE.TYPE_NORMAL_NUM));
 		
+		mesh_renderer = GetComponent<MeshRenderer>();
 		mat = GetComponent<MeshRenderer>().material;// マテリアルを取得しておく
 		
 		SetTypeColor();
@@ -58,4 +60,8 @@ public class Block : MonoBehaviour {
 		mat.SetColor("_Color",set_color);
 	}
 	
+	
+	void SetMaterial( Material mat ){
+		mesh_renderer.material = mat;
+	}
 }
