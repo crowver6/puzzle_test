@@ -21,8 +21,15 @@ public class Block : MonoBehaviour {
 		TYPE_NORMAL_NUM = TYPE_SP1,
 		TYPE_SP_NUM = TYPE_MAX - TYPE_NORMAL_NUM
 	}
+	
+	public enum STATE{
+		NORMAL,
+		DELETE,
+		STATE_MAX
+	}
 
-	public int type;
+	int type;
+	int state;
 	Material mat;
 	MeshRenderer mesh_renderer;
 	
@@ -39,9 +46,17 @@ public class Block : MonoBehaviour {
 		SetTypeColor();
 	}
 	
+	public void Delete(){
+		 SetState(STATE.DELETE);
+	}
+	
 	// Update is called once per frame
 	void Update () {
-	
+		
+		// 自身を消去
+		if( GetState() == STATE.DELETE ){
+			Destroy(this);
+		}
 	}
 	
 	
@@ -61,7 +76,19 @@ public class Block : MonoBehaviour {
 	}
 	
 	
-	void SetMaterial( Material mat ){
+	public void SetMaterial( Material mat ){
 		mesh_renderer.material = mat;
+	}
+	
+	public TYPE GetBlockType(){
+		return (TYPE)type;
+	}
+	
+	public STATE GetState(){
+		return (STATE)state;
+	}
+	
+	public void SetState( STATE _set ){
+		state = (int)_set;
 	}
 }
