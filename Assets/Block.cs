@@ -28,8 +28,8 @@ public class Block : MonoBehaviour {
 		STATE_MAX
 	}
 
-	int type;
-	int state;
+	public TYPE type;
+	public STATE state;
 	Material mat;
 	MeshRenderer mesh_renderer;
 	
@@ -38,7 +38,7 @@ public class Block : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		type = (int)(Random.Range((int)TYPE.TYPE_1,(int)TYPE.TYPE_NORMAL_NUM));
+		type = (TYPE)(Random.Range((int)TYPE.TYPE_1,(int)TYPE.TYPE_NORMAL_NUM));
 		
 		mesh_renderer = GetComponent<MeshRenderer>();
 		mat = GetComponent<MeshRenderer>().material;// マテリアルを取得しておく
@@ -54,8 +54,12 @@ public class Block : MonoBehaviour {
 	void Update () {
 		
 		// 自身を消去
-		if( GetState() == STATE.DELETE ){
-			Destroy(this);
+		switch(GetState()){
+		case STATE.NORMAL:
+			break;
+		case STATE.DELETE:
+			Destroy(this.gameObject);
+			break;
 		}
 	}
 	
@@ -64,31 +68,33 @@ public class Block : MonoBehaviour {
 		Color set_color;
 		
 		switch(type){
-		case (int)TYPE.TYPE_1:	set_color = Color.red;		break;
-		case (int)TYPE.TYPE_2:	set_color = Color.blue;		break;
-		case (int)TYPE.TYPE_3:	set_color = Color.cyan;		break;
-		case (int)TYPE.TYPE_4:	set_color = Color.yellow;	break;
-		case (int)TYPE.TYPE_5:	set_color = Color.green;	break;
-		case (int)TYPE.TYPE_6:	set_color = Color.white;	break;
-		default:				set_color = Color.black;	break;
+		case TYPE.TYPE_1:	set_color = Color.red;		break;
+		case TYPE.TYPE_2:	set_color = Color.blue;		break;
+		case TYPE.TYPE_3:	set_color = Color.cyan;		break;
+		case TYPE.TYPE_4:	set_color = Color.yellow;	break;
+		case TYPE.TYPE_5:	set_color = Color.green;	break;
+		case TYPE.TYPE_6:	set_color = Color.white;	break;
+		default:			set_color = Color.black;	break;
 		}
 		mat.SetColor("_Color",set_color);
 	}
-	
-	
 	public void SetMaterial( Material mat ){
 		mesh_renderer.material = mat;
 	}
 	
+	// ブロックの種類　
+	public void SetBlockType( TYPE _set ){
+		type = _set;
+	}
 	public TYPE GetBlockType(){
-		return (TYPE)type;
+		return type;
 	}
-	
+
+	// ブロックの状態　
 	public STATE GetState(){
-		return (STATE)state;
+		return state;
 	}
-	
 	public void SetState( STATE _set ){
-		state = (int)_set;
+		state = _set;
 	}
 }
