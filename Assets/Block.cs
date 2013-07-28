@@ -30,20 +30,20 @@ public class Block : MonoBehaviour {
 
 	public TYPE type;
 	public STATE state;
-	Material mat;
-	MeshRenderer mesh_renderer;
+//	Material mat;
+//	MeshRenderer mesh_renderer;
 	
 	
 	
 	
 	// Use this for initialization
 	void Start () {
-		type = (TYPE)(Random.Range((int)TYPE.TYPE_1,(int)TYPE.TYPE_NORMAL_NUM));
+//		type = (TYPE)(Random.Range((int)TYPE.TYPE_1,(int)TYPE.TYPE_NORMAL_NUM));
 		
-		mesh_renderer = GetComponent<MeshRenderer>();
-		mat = GetComponent<MeshRenderer>().material;// マテリアルを取得しておく
+//		mesh_renderer = GetComponent<MeshRenderer>();
+//		mat = GetComponent<MeshRenderer>().material;// マテリアルを取得しておく
 		
-		SetTypeColor();
+//		SetTypeColor();
 	}
 	
 	public void Delete(){
@@ -63,7 +63,7 @@ public class Block : MonoBehaviour {
 		}
 	}
 	
-	
+/*	
 	void SetTypeColor(){
 		Color set_color;
 		
@@ -78,9 +78,12 @@ public class Block : MonoBehaviour {
 		}
 		mat.SetColor("_Color",set_color);
 	}
+*/
+/*
 	public void SetMaterial( Material mat ){
 		mesh_renderer.material = mat;
 	}
+*/
 	
 	// ブロックの種類　
 	public void SetBlockType( TYPE _set ){

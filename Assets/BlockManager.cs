@@ -28,7 +28,7 @@ public class BlockManager : MonoBehaviour {
 	}
 	
 	// 実体を管理-
-	Block[,] block_tbl = new Block[table_width,table_height];
+	public Block[,] block_tbl = new Block[table_width,table_height];
 	
 	public PHASE phase;
 	
@@ -60,12 +60,17 @@ public class BlockManager : MonoBehaviour {
 				break;
 			case PHASE.ERASE:
 				SetPhase(PHASE.ADD);
+				SetWaitTime(1.0f);
 				break;
 			case PHASE.ADD:
+				Layout();
 				SetPhase(PHASE.FALL);
+				SetWaitTime(1.0f);
 				break;
 			case PHASE.FALL:
+				Move();
 				SetPhase(PHASE.WAIT);
+				SetWaitTime(1.0f);
 				break;
 			}
 		}
@@ -94,7 +99,7 @@ public class BlockManager : MonoBehaviour {
 	}
 	
 	Vector3 GetTransBlock( int x, int y ){
-		return new Vector3((float)(x-(table_width/2)),0,(float)(y-(table_height/2)));
+		return new Vector3((float)(x-(table_width/2)),0,(float)((table_height/2)-y));
 	}
 	
 	Block.TYPE GetBlockTypeRandom(){
@@ -107,67 +112,107 @@ public class BlockManager : MonoBehaviour {
 		int h = table_height;
 		for( i = 0; i < w; i++ ){
 			for( j = 0; j < h; j++ ){
-				Block.TYPE tmp_type = GetBlockTypeRandom();
-				GameObject tmp = Instantiate(src[(int)tmp_type],GetTransBlock(i,j),Quaternion.identity) as GameObject;
-				block_tbl[i,j] = (Block)tmp.GetComponent<Block>();
-				block_tbl[i,j].SetBlockType(tmp_type);
+				if( block_tbl[i,j] == null ){
+					Block.TYPE tmp_type = GetBlockTypeRandom();
+					GameObject tmp = Instantiate(src[(int)tmp_type],GetTransBlock(i,j),Quaternion.identity) as GameObject;
+					block_tbl[i,j] = (Block)tmp.GetComponent<Block>();
+					block_tbl[i,j].SetBlockType(tmp_type);
+				}
 			}
 		}
 	}
 	
 	void SerchErase(){
-		Block.TYPE tmp_type;
-		int i,j,k;
+		Block.TYPE tmp_type = Block.TYPE.TYPE_1;
+		int i,j;
 		int w = table_width;
 		int h = table_height;
 		
 		int count_line = 0;
 		
-
 		// ーー縦方向を調べるーー 
 		for( i = 0; i < w; i++ ){
-			tmp_type = block_tbl[i,0].GetBlockType();
-			count_line = 1;
-			for( j = 0; j < h; j++ ){
-				if( tmp_type == block_tbl[i,j].GetBlockType() ){
-					count_line++;
-				}
-				else{// １個前のブロックと違う 
-					// 連続して３個以上同色か？ 
-					if( count_line >= erase_num ){
-						// さかのぼって連続した同色のブロックを消去状態にする 
-						for( count_line = count_line - 1; count_line >= 0; count_line-- ){
-							Block tmp_block = block_tbl[i,j-count_line];
-							tmp_block.Delete();
-//							block_tbl[i,j-count_line].Delete();
+			if( block_tbl[i,0] ){
+				count_line = 0;
+				tmp_type = block_tbl[0,0].GetBlockType();
+				for( j = 0; j < h; j++ ){
+					if( block_tbl[i,j] ){
+						if( tmp_type == block_tbl[i,j].GetBlockType() ){
+							count_line++;
+						}
+						else
+						{
+							if( tmp_type != block_tbl[i,j].GetBlockType() || h >= j+1 )// １個前のブロックと違う、列最後のブロック 
+							{
+								// 消去処理
+								// 連続して３個以上同色か？ 
+								if( count_line >= erase_num ){
+									// さかのぼって連続した同色のブロックを消去状態にする 
+									for( ; count_line > 0; count_line-- ){
+										block_tbl[i,j-count_line].Delete();
+										block_tbl[i,j-count_line] = null;
+									}
+								}
+							}
+							// チェックするブロックを変更
+							if( block_tbl[i,j] ){
+								tmp_type = block_tbl[i,j].GetBlockType();
+							}
+							count_line = 1;
 						}
 					}
-					// 
-					tmp_type = block_tbl[i,j].GetBlockType();
-					count_line = 1;
 				}
 			}
 		}
 
 		// ーー横方向を調べるーー
 		for( j = 0; j < h; j++ ){
-			tmp_type = block_tbl[0,j].GetBlockType();
-			count_line = 1;
-			for( i = 0; i < w; i++ ){
-				if( tmp_type == block_tbl[i,j].GetBlockType() ){
-					count_line++;
-				}
-				else{// １個前のブロックと違う 
-					// 連続して３個以上同色か？ 
-					if( count_line >= erase_num ){
-						// さかのぼって連続した同色のブロックを消去状態にする 
-						for( count_line = count_line - 1; count_line >= 0; count_line-- ){
-							Block tmp_block = block_tbl[i-count_line,j];
-							block_tbl[i-count_line,j].Delete();
+			if( block_tbl[0,j] ){
+				count_line = 0;
+				tmp_type = block_tbl[0,0].GetBlockType();
+				for( i = 0; i < w; i++ ){
+					if( block_tbl[i,j] ){
+						if( tmp_type == block_tbl[i,j].GetBlockType() ){
+							count_line++;
+						}
+						else
+						{
+							if( tmp_type != block_tbl[i,j].GetBlockType() || w >= i+1 ){// １個前のブロックと違う、行最後のブロック 
+								// 消去処理
+								// 連続して３個以上同色か？ 
+								if( count_line >= erase_num ){
+									// さかのぼって連続した同色のブロックを消去状態にする 
+									for( ; count_line > 0; count_line-- ){
+										block_tbl[i-count_line,j].Delete();
+										block_tbl[i-count_line,j] = null;
+									}
+								}
+							}
+							// チェックするブロックを変更
+							if( block_tbl[i,j] ){
+								tmp_type = block_tbl[i,j].GetBlockType();
+							}
+							count_line = 1;
 						}
 					}
-					tmp_type = block_tbl[i,j].GetBlockType();
-					count_line = 1;
+				}
+			}
+		}
+	}
+	
+	void Move(){
+		int i,j;
+		int w = table_width;
+		int h = table_height;
+		
+		// ーー横方向を調べるーー
+		for( j = h-2; j >= 0; j-- ){
+			for( i = 0; i < w; i++ ){
+				if( block_tbl[i,j] != null ){
+					if( block_tbl[i,j+1] == null ){
+						block_tbl[i,j+1] = block_tbl[i,j];
+						block_tbl[i,j] = null;
+					}
 				}
 			}
 		}
